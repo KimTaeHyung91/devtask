@@ -1,0 +1,120 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.5.0')
+        classpath("io.spring.gradle:dependency-management-plugin:1.0.11.RELEASE")
+    }
+}
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'java'
+
+group = 'com.idus'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // spring boot starter
+    implementation 'org.springframework.boot:spring-boot-starter'
+    // spring jpa
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // spring web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // AOP
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    // Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    // Mysql
+    implementation 'mysql:mysql-connector-java'
+    // swagger2
+    implementation('io.springfox:springfox-swagger2:2.9.2') {
+        // 2.9.2 annotation, models 제외
+        exclude group: 'io.swagger', module: 'swagger-annotations'
+        exclude group: 'io.swagger', module: 'swagger-models'
+    }
+    // swagger2 ui
+    implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+    // swagger-annotations:1.5.21
+    implementation 'io.swagger:swagger-annotations:1.5.21'
+    // swagger-models:1.5.21
+    implementation 'io.swagger:swagger-models:1.5.21'
+    // junit4
+    implementation 'junit:junit:4.12'
+
+    // querydsl core
+    implementation 'com.querydsl:querydsl-core'
+    // querydsl jpa
+    implementation 'com.querydsl:querydsl-jpa'
+
+    // h2 database
+    runtimeOnly 'com.h2database:h2'
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    // log4j
+    compileOnly 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'
+
+    annotationProcessor ("org.projectlombok:lombok")
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+// querydsl
+apply plugin: "io.spring.dependency-management"
+dependencies {
+    compileOnly("com.querydsl:querydsl-core") // querydsl
+    compileOnly("com.querydsl:querydsl-jpa") // querydsl
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa" // querydsl JPAAnnotationProcessor 사용 지정
+    annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+    annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+
+}
+def generated='src/main/generated'
+sourceSets {
+    main.java.srcDirs += [ generated ]
+}
+
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file(generated)
+}
+
+clean.doLast {
+    file(generated).delete()
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir('src/main/resource')
+        }
+    }
+}
+
+bootRun {
+    String activeProfile = System.properties['spring.profiles.active']
+    activeProfile = activeProfile == null ? 'develop' : activeProfile
+    println "============================== current active profile : $activeProfile ===================================="
+    systemProperty "spring.profiles.active", activeProfile
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,45 @@
+spring:
+  profiles:
+    active: local
+  jwt:
+    secret: com.idus.devtask
+
+# local 환경
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  h2:
+    console:
+      enabled: true
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+
+# develop 환경
+---
+spring:
+  config:
+    activate:
+      on-profile: develop
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/dev_task
+    username:
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: false
+  sql:
+    init:
+      platform: mysql
+      encoding: UTF-8
+      enabled: true
