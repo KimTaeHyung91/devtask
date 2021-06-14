@@ -103,7 +103,7 @@ clean.doLast {
 sourceSets {
     main {
         resources {
-            srcDir('src/main/resource')
+            srcDir('src/main/resources')
         }
     }
 }
